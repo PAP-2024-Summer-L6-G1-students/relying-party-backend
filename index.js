@@ -1,6 +1,7 @@
 const express = require('express')
+const { connectMongoose } = require('./connect'); // import for connecting to MongoDB
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3002
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -9,3 +10,16 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+//* ********************* Launching the server **************** */
+const start = async () => {
+  try {
+      await connectMongoose();
+      app.listen(port, () => console.log(`Server running on port ${port}...`));
+  }
+  catch (err) {
+      console.error(err);
+  }
+}
+
+start();
