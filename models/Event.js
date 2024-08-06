@@ -16,10 +16,8 @@ const eventsSchema = new Schema({
   specialRequirements: String,
   maxParticipants: Number, 
   // Event Times
-  startDate: Date, 
-  startTime: String,
-  endDate: Date,
-  endTime: String,
+  startDateTime: Date, 
+  endDateTime: Date,
   }); 
 
   const Event = model('Event', eventsSchema, collectionName); // creates Mongoose model named "Event"
