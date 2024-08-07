@@ -2,6 +2,7 @@ require('dotenv').config();
 const collectionName = process.env.DB_EVENTS_COLLECTION;
 const { Schema, model } = require('mongoose');
 
+// ------------- Events Schema -------------
 const eventsSchema = new Schema({
   // Event Organizer Info
   organizerName : String,
@@ -20,5 +21,22 @@ const eventsSchema = new Schema({
   endDateTime: Date,
   }); 
 
-  const Event = model('Event', eventsSchema, collectionName); // creates Mongoose model named "Event"
-  module.exports = Event;
+
+// ------------- Events Class -------------
+class EventsClass {
+  // Create new event 
+  static async createNew(event) {
+    try {
+      const newEvent = await Event.create(event);
+      return newEvent;
+    }
+    catch (e) {
+      console.error(e);
+      return {_id: -1}
+    }
+  }
+}
+
+eventsSchema.loadClass(EventsClass);
+const Event = model('Event', eventsSchema, collectionName); // creates Mongoose model named "Event"
+module.exports = Event;
