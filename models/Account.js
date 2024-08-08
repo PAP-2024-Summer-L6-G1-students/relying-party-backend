@@ -5,14 +5,13 @@ const { Schema, model } = require('mongoose');
 // ------------- Accounts Schema -------------
 const accountsSchema = new Schema({
     // Currently there is no "username", this can be added
-    firstName: String,
-    lastName: String,
-    bio: String,
-    // Users will log-in using their email/phone number
-    email: String,
-    phoneNum: String,
-    password: String,
-    // Below stores events user has applied to or has created
+    identityProviderUserID: String,
+    // firstName: String,
+    // lastName: String,
+    // bio: String,
+    // email: String,
+    // phoneNum: String,
+    // password: String,
     eventsApplied: [ObjectId],
     eventsCreated: [ObjectId],
   });
