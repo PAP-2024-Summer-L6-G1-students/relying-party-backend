@@ -44,6 +44,48 @@ app.post('/events', async (req, res) => {
   }
 });
 
+// EXAMPLE ROUTE - EXAMPLE EVENTS 
+app.get('/events/test', (req, res) => {
+  // Example events for testing
+  const exampleEvents = [
+    {
+      _id: "example1",
+      organizerName: "John Doe",
+      organizerEmail: "john@example.com",
+      organizerPhone: "555-5555",
+      eventType: "Technology",
+      eventDescription: "A tech conference",
+      location: "New York",
+      virtual: false,
+      specialRequirements: "None",
+      maxParticipants: 100,
+      eventParticipants: [],
+      eventCreatedBy: "exampleUserId1",
+      startDateTime: "2024-08-20T14:00:00Z",
+      endDateTime: "2024-08-20T18:00:00Z"
+    },
+    {
+      _id: "example2",
+      organizerName: "Jane Smith",
+      organizerEmail: "jane@example.com",
+      organizerPhone: "555-1234",
+      eventType: "Environmental",
+      eventDescription: "A sustainability workshop",
+      location: "Online",
+      virtual: true,
+      specialRequirements: "None",
+      maxParticipants: 50,
+      eventParticipants: [],
+      eventCreatedBy: "exampleUserId2",
+      startDateTime: "2024-09-15T10:00:00Z",
+      endDateTime: "2024-09-15T12:00:00Z"
+    }
+  ];
+
+  // Return the example events as a JSON response
+  res.status(200).json(exampleEvents);
+});
+
 //* ********************* Launching the server **************** */
 const start = async () => {
   try {
