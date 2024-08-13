@@ -1,7 +1,7 @@
 require('dotenv').config();
 const collectionName = process.env.DB_EVENTS_COLLECTION;
 const { ObjectId } = require('mongodb');
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 // ------------- Events Schema -------------
 const eventsSchema = new Schema({
@@ -16,8 +16,8 @@ const eventsSchema = new Schema({
   virtual: Boolean,
   specialRequirements: String,
   maxParticipants: Number,
-  eventParticipants: [ObjectId], 
-  eventCreatedBy: ObjectId,
+  eventParticipants: [Types.ObjectId], 
+  eventCreatedBy: Types.ObjectId,
   // Event Times
   startDateTime: Date, 
   endDateTime: Date,

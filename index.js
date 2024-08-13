@@ -1,21 +1,18 @@
+const cors = require('cors');
 const express = require('express')
 const { connectMongoose } = require('./connect'); // import for connecting to MongoDB
 const Account = require('./models/Account'); // import for accounts model
 const Event = require('./models/Event'); // import for events model
 
-const app = express()
-const port = process.env.PORT || 3002
+const app = express();
+const port = process.env.PORT || 3002;
 
+app.use(cors());
 // ------------ Routes ------------
 
 // TEST ROUTE
 app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-// TEST ROUTE
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  res.send('Hello World!');
 })
 
 // ROUTE 1 - GET ALL EVENTS
@@ -50,7 +47,7 @@ app.get('/events/test', (req, res) => {
   const exampleEvents = [
     {
       _id: "example1",
-      organizerName: "John Doe",
+      organizerName: "Example Org 1",
       organizerEmail: "john@example.com",
       organizerPhone: "555-5555",
       eventType: "Technology",
@@ -66,7 +63,7 @@ app.get('/events/test', (req, res) => {
     },
     {
       _id: "example2",
-      organizerName: "Jane Smith",
+      organizerName: "Example Org 2",
       organizerEmail: "jane@example.com",
       organizerPhone: "555-1234",
       eventType: "Environmental",
@@ -83,6 +80,7 @@ app.get('/events/test', (req, res) => {
   ];
 
   // Return the example events as a JSON response
+  console.log('Now sending example events...');
   res.status(200).json(exampleEvents);
 });
 
