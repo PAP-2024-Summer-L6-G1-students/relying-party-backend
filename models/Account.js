@@ -1,6 +1,6 @@
 require('dotenv').config();
 const collectionName = process.env.DB_ACCOUNTS_COLLECTION;
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 // ------------- Accounts Schema -------------
 const accountsSchema = new Schema({
@@ -12,8 +12,8 @@ const accountsSchema = new Schema({
     // email: String,
     // phoneNum: String,
     // password: String,
-    eventsApplied: [ObjectId],
-    eventsCreated: [ObjectId],
+    eventsApplied: [Types.ObjectId],
+    eventsCreated: [Types.ObjectId],
   });
 
 
