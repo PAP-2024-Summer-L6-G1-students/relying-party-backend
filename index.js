@@ -41,6 +41,31 @@ app.post('/events', async (req, res) => {
   }
 });
 
+// ROUTE 3 - ADD EVENT TO EVENTS APPLIED USING identityProviderUserID
+app.post('/accounts/:identityProviderUserID/events/:eventId/apply', async (req, res) => {
+  try {
+    const { identityProviderUserID, eventId } = req.params;
+
+    // Find the account by identityProviderUserID and add the event ID to eventsApplied
+    const account = await Account.findOne({ identityProviderUserID });
+    if (!account) {
+      return res.status(404).json({ message: 'Account not found' });
+    }
+
+    // Check if the event is already in eventsApplied to avoid duplicates
+    if (!account.eventsApplied.includes(eventId)) {
+      account.eventsApplied.push(eventId);
+      await account.save();
+      return res.status(200).json({ message: 'Event added to eventsApplied', account });
+    } else {
+      return res.status(400).json({ message: 'Event already applied to' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to apply for event' });
+  }
+});
+
 // EXAMPLE ROUTE - EXAMPLE EVENTS 
 app.get('/events/test', (req, res) => {
   // Example events for testing
