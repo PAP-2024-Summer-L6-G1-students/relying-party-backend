@@ -8,6 +8,7 @@ const app = express();
 const port = process.env.PORT || 3002;
 
 app.use(cors());
+app.use(express.json());
 // ------------ Routes ------------
 
 // TEST ROUTE
@@ -28,6 +29,7 @@ app.get('/events', async (req, res) => {
 // ROUTE 2 - CREATE EVENTS 
 app.post('/events', async (req, res) => {
   try {
+    console.log('Received Event Data:', req.body);
     const eventData = req.body; // Get event data from the request body
     const newEvent = await Event.createNew(eventData); // Create the new event
     if (newEvent._id !== -1) {
