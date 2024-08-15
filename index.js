@@ -43,7 +43,48 @@ app.post('/events', async (req, res) => {
   }
 });
 
-// ROUTE 3 - ADD EVENT TO EVENTS APPLIED USING identityProviderUserID
+// ROUTE - CREATE ACCOUNT ROUTE
+app.post('/accounts/create', async (req, res) => {
+  try {
+    console.log('Received Account Data:', req.body);
+    
+    // Create a new account with the provided identityProviderUserID
+    const newAccount = await Account.createNew({
+      identityProviderUserID: req.body.identityProviderUserID,
+    });
+
+    // Check if account creation was successful
+    if (newAccount._id !== -1) {
+      res.status(201).json(newAccount); // ACCOUNT CREATED SUCCESSFULLY
+    } else {
+      res.status(400).json({ message: 'Failed to create account' }); // ACCOUNT CREATION FAILED
+    }
+  } catch (error) {
+    console.error('Error creating account:', error);
+    res.status(500).json({ message: 'Failed to create account' }); // INTERNAL SERVER ERROR
+  }
+});
+
+// ROUTE - READ ALL EVENTS APPLIED BY AN ACCOUNT
+app.get('/accounts/:accountId/events-applied', async (req, res) => {
+  try {
+    const { accountId } = req.params;
+
+    // Find the account by ID and populate the eventsApplied field
+    const account = await Account.findById(accountId).populate('eventsApplied').exec();
+
+    if (account) {
+      res.status(200).json(account.eventsApplied); // Return the list of events applied
+    } else {
+      res.status(404).json({ message: 'Account not found' }); // Account not found
+    }
+  } catch (error) {
+    console.error('Error reading events applied:', error);
+    res.status(500).json({ message: 'Failed to retrieve events applied' }); // Internal server error
+  }
+});
+
+// ROUTE - ADD EVENT TO EVENTS APPLIED USING identityProviderUserID
 app.post('/accounts/:identityProviderUserID/events/:eventId/apply', async (req, res) => {
   try {
     const { identityProviderUserID, eventId } = req.params;
@@ -66,49 +107,6 @@ app.post('/accounts/:identityProviderUserID/events/:eventId/apply', async (req, 
     console.error(error);
     res.status(500).json({ message: 'Failed to apply for event' });
   }
-});
-
-// EXAMPLE ROUTE - EXAMPLE EVENTS 
-app.get('/events/test', (req, res) => {
-  // Example events for testing
-  const exampleEvents = [
-    {
-      _id: "example1",
-      organizerName: "Example Org 1",
-      organizerEmail: "john@example.com",
-      organizerPhone: "555-5555",
-      eventType: "Technology",
-      eventDescription: "A tech conference",
-      location: "New York",
-      virtual: false,
-      specialRequirements: "None",
-      maxParticipants: 100,
-      eventParticipants: [],
-      eventCreatedBy: "exampleUserId1",
-      startDateTime: "2024-08-20T14:00:00Z",
-      endDateTime: "2024-08-20T18:00:00Z"
-    },
-    {
-      _id: "example2",
-      organizerName: "Example Org 2",
-      organizerEmail: "jane@example.com",
-      organizerPhone: "555-1234",
-      eventType: "Environmental",
-      eventDescription: "A sustainability workshop",
-      location: "Online",
-      virtual: true,
-      specialRequirements: "None",
-      maxParticipants: 50,
-      eventParticipants: [],
-      eventCreatedBy: "exampleUserId2",
-      startDateTime: "2024-09-15T10:00:00Z",
-      endDateTime: "2024-09-15T12:00:00Z"
-    }
-  ];
-
-  // Return the example events as a JSON response
-  console.log('Now sending example events...');
-  res.status(200).json(exampleEvents);
 });
 
 //* ********************* Launching the server **************** */
