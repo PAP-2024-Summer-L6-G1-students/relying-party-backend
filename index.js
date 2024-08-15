@@ -152,6 +152,29 @@ app.post('/authorizelogin/:authorizationCode', async (req, res) => {
   res.sendStatus(200);
 });
 
+// Route - Retrieve user info for identity provider for profile page
+app.get('/get-user-info', async (req, res) => {
+  const token = req.cookies.token;
+  if (token) {
+      jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+          if (err) {
+            console.error(err);
+            return res.status(403).json([]); // Forbidden if token is invalid
+          } else {
+              process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+              const response = await fetch(`https://localhost:3002/SSO/get-user-info/${decoded.userUUID}/${process.env.SSOAPIKEY}`,
+                 {method: 'GET', credentials: 'include',
+                 });
+              const responseData = await response.json();
+              return res.status(200).json(responseData);
+          }   
+      });
+  } else {
+      console.log("Token does not exist");
+      return res.status(403).json([]); // Forbidden if user exists and token not provided
+  }
+});
+
 
 //* ********************* Launching the server **************** */
 const start = async () => {
