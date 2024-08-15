@@ -1,20 +1,37 @@
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
 const cors = require('cors');
 const express = require('express')
+const cookieParser = require('cookie-parser'); 
 const { connectMongoose } = require('./connect'); // import for connecting to MongoDB
 const Account = require('./models/Account'); // import for accounts model
 const Event = require('./models/Event'); // import for events model
+const jwt = require('jsonwebtoken');
 
 const app = express();
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 3003;
 
-app.use(cors());
+
+app.use(cors({
+  origin: ['https://localhost:5174', 'https://localhost:3002'],
+  credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
 // ------------ Routes ------------
 
 // TEST ROUTE
 app.get('/', (req, res) => {
   res.send('Hello World!');
 })
+
+// ROUTE - LOGIN RECEIVER
+app.post('/login-receiver', async (req, res) => {
+  console.log(req.cookies);
+  return res.redirect("https://localhost:5174/");
+});
+
 
 // ROUTE 1 - GET ALL EVENTS
 app.get('/events', async (req, res) => {
@@ -109,11 +126,46 @@ app.post('/accounts/:identityProviderUserID/events/:eventId/apply', async (req, 
   }
 });
 
+const agent = new https.Agent({  
+  rejectUnauthorized: false
+});
+
+
+// Authorize login route
+app.post('/authorizelogin/:authorizationCode', async (req, res) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  const response = await fetch("https://localhost:3002/SSO/authorizelogin",
+     {method: 'POST', credentials: 'include',
+      body: JSON.stringify({authorizationCode: req.params.authorizationCode, apiKey: process.env.SSOAPIKEY}),
+      headers: {"Content-Type": "application/json"},
+  });
+  // SETS COOKIE IN RELYING PARTY FRONT END
+  const tokenData = await response.json();
+  const token = jwt.sign(tokenData, process.env.JWT_SECRET, { expiresIn: '7d' });
+  res.cookie('token', token, {
+    httpOnly: true,
+    sameSite: 'None',
+    secure: true
+  });
+  // ------------------------------------------------------
+  console.log(tokenData); // Get response as text
+  res.sendStatus(200);
+});
+
+
 //* ********************* Launching the server **************** */
 const start = async () => {
   try {
       await connectMongoose();
-      app.listen(port, () => console.log(`Server running on port ${port}...`));
+
+      const httpsOptions = {
+        key: fs.readFileSync(path.resolve(__dirname, '../localhost-key.pem')),
+        cert: fs.readFileSync(path.resolve(__dirname, '../localhost.pem'))
+      };
+  
+      https.createServer(httpsOptions, app).listen(port, () => {
+          console.log(`Express API server running on https://localhost:${port}`);
+      });
   }
   catch (err) {
       console.error(err);
